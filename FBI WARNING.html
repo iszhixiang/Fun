@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页生成器</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    input[type="text"], input[type="color"], input[type="number"] {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result-container {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .result {
+      background-color: #000;
+      color: white;
+      padding: 20px;
+      display: inline-block;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+
+    .text-red {
+      color: white;
+      padding: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .text-white {
+      color: white;
+      text-align: left;
+      margin-top: 20px;
+      font-size: 18px;
+      white-space: pre-wrap;  /* 允许自动换行 */
+      word-wrap: break-word;  /* 单词超出宽度时换行 */
+    }
+
+    #status-message {
+      color: green;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>网页生成器</h1>
+    <p>输入文字内容，生成图片后下载</p>
+    <form id="input-form">
+      <input type="text" id="input1" placeholder="输入框 1：红底白字" required />
+      <input type="text" id="input2" placeholder="输入框 2：普通白字" required />
+      <input type="number" id="font-size" placeholder="字体大小 (例如 24)" />
+      <input type="color" id="text-color" value="#ffffff" />
+      <button type="submit" id="generate-btn">生成预览</button>
+    </form>
+    <p id="status-message"></p>
+  </div>
+
+  <div class="result-container" id="result-container">
+    <canvas id="canvas" style="border: 1px solid #000;"></canvas>
+    <br />
+    <button id="download-btn" style="margin-top: 10px; display: none;">下载图片</button>
+  </div>
+
+  <script>
+    document.getElementById("input-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // 获取用户输入
+      const input1 = document.getElementById("input1").value;
+      let input2 = document.getElementById("input2").value;
+      const fontSize = document.getElementById("font-size").value || "24";
+      const textColor = document.getElementById("text-color").value || "#ffffff";
+
+      // 在第二个输入框的文字前加上两个空格
+      input2 = "  " + input2;
+
+      // 禁用按钮，直到生成结果
+      const generateBtn = document.getElementById("generate-btn");
+      generateBtn.disabled = true;
+      document.getElementById("status-message").textContent = "生成中...";
+
+      // 获取 canvas 元素
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // 设置 canvas 大小
+      canvas.width = 600;
+      canvas.height = 400;
+
+      // 填充背景颜色
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 设置字体样式
+      ctx.font = `${fontSize}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      // 绘制红底白字的文本
+ctx.fillStyle = "red";
+const text1Width = ctx.measureText(input1).width;  // 获取文本的宽度
+ctx.fillRect((canvas.width - text1Width) / 2 - 10, 30, text1Width + 20, parseInt(fontSize) + 20); // 红底矩形上移
+ctx.fillStyle = "white";
+ctx.fillText(input1, canvas.width / 2, 50);  // 文字上移，y 坐标调整为 60
+
+// 绘制第二段普通白字的文本并自动换行
+ctx.fillStyle = textColor;
+const maxWidth = canvas.width - 40;  // 最大宽度，留边
+let line = "";
+let lines = [];
+
+// 自动换行逻辑
+for (let i = 0; i < input2.length; i++) {
+  line += input2[i];
+  if (ctx.measureText(line).width > maxWidth) {
+    lines.push(line.slice(0, -1));  // 删除超出部分的字符
+    line = input2[i];  // 新的一行从当前字符开始
+  }
+}
+lines.push(line);  // 加上最后一行
+
+// 在画布上绘制换行后的文本
+let yOffset = 100;  // 第二段文字的起始 y 坐标，相对于红底文字上移
+lines.forEach(line => {
+  ctx.fillText(line, canvas.width / 2, yOffset);
+  yOffset += parseInt(fontSize) + 5;  // 每行的垂直间距
+});
+
+
+      // 显示结果容器和下载按钮
+      const resultContainer = document.getElementById("result-container");
+      resultContainer.style.display = "block";
+
+      // 显示状态信息
+      document.getElementById("status-message").textContent = "预览已生成。";
+
+      // 设置下载按钮的点击事件
+      const downloadBtn = document.getElementById("download-btn");
+      downloadBtn.style.display = "inline-block";
+      downloadBtn.onclick = function () {
+        const dataUrl = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "generated_image.png";
+        link.click();
+      };
+
+      // 启用按钮
+      generateBtn.disabled = false;
+    });
+  </script>
+</body>
+</html>
