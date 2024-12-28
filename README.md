@@ -3,4 +3,4 @@
 ![image](https://github.com/iszhixiang/images/blob/main/2024-12-28/%E6%93%8D%E4%BD%9C%E9%A1%B5%E9%9D%A2.png)
 
 生成的照片效果
-！[image](https://github.com/iszhixiang/images/blob/main/2024-12-28/%E4%B8%8B%E8%BD%BD%E5%9B%BE%E7%89%87%E6%95%88%E6%9E%9C.png)
+![image](https://github.com/iszhixiang/images/blob/main/2024-12-28/%E4%B8%8B%E8%BD%BD%E5%9B%BE%E7%89%87%E6%95%88%E6%9E%9C.png)
